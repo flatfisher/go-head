@@ -8,7 +8,8 @@ import (
 )
 
 var (
-	nOpt = flag.Int("n", 10, "help message for n option")
+	nOpt = flag.Int("n", 10, "Number of line to print")
+	sOpt = flag.Bool("s", false, "Print lines number of file")
 )
 
 func get_args() (int, []string) {
@@ -22,8 +23,22 @@ func get_args() (int, []string) {
 	return len(args), args
 }
 
+func lineCounter(file *os.File) int {
+	count := 0
+	sc := bufio.NewScanner(file)
+	for i := 1; sc.Scan(); i++ {
+		if err := sc.Err(); err != nil {
+			os.Exit(1)
+			break
+		}
+		count += 1
+	}
+	return count
+}
+
 func print_rows(file *os.File) {
 	sc := bufio.NewScanner(file)
+
 	for i := 1; sc.Scan(); i++ {
 		if err := sc.Err(); err != nil {
 			os.Exit(1)
@@ -40,6 +55,11 @@ func main() {
 	len, args := get_args()
 	for i, path := range args {
 		file, err := os.Open(path)
+		if err != nil {
+			fmt.Println("Failed to open file.")
+			os.Exit(2)
+		}
+		defer file.Close()
 
 		if i >= 1 {
 			fmt.Printf("\n")
@@ -49,12 +69,19 @@ func main() {
 			fmt.Printf("==> %s <==\n", path)
 		}
 
-		if err != nil {
-			fmt.Println("Failed to open file.")
-			os.Exit(2)
+		if *sOpt {
+			//README: Skip line print
+			rows := lineCounter(file)
+			switch rows {
+			case 0:
+				fmt.Printf("%s has no line\n", path)
+			case 1:
+				fmt.Printf("%s has one line\n", path)
+			default:
+				fmt.Printf("%s has %d lines\n", path, rows)
+			}
+		} else {
+			print_rows(file)
 		}
-		defer file.Close()
-
-		print_rows(file)
 	}
 }
