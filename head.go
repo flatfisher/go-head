@@ -8,23 +8,31 @@ import (
 )
 
 var (
-	nOpt = flag.Int("n", 0, "help message for n option")
+	nOpt = flag.Int("n", 10, "help message for n option")
 )
 
 func main() {
-	file_path := flag.Args()
 	flag.Parse()
+	file_path := flag.Args()
 
-	file, err := os.Open(file_path)
+	if len(file_path) < 1 {
+		fmt.Println("Invalid argument, you must specify a path.")
+		os.Exit(1)
+	}
+
+	file, err := os.Open(file_path[0])
 	if err != nil {
-		// Openエラー処理
+		fmt.Println("Failed to open file.")
+		os.Exit(2)
 	}
 	defer file.Close()
 
+	fmt.Println(*nOpt)
 	sc := bufio.NewScanner(file)
+
 	for i := 1; sc.Scan(); i++ {
 		if err := sc.Err(); err != nil {
-			// エラー処理
+			os.Exit(1)
 			break
 		}
 		fmt.Printf("%s\n", sc.Text())
