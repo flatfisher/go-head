@@ -12,7 +12,7 @@ var (
 	sOpt = flag.Bool("s", false, "Print lines number of file")
 )
 
-func get_args() (int, []string) {
+func getArgs() (int, []string) {
 	flag.Parse()
 	args := flag.Args()
 	if len(args) < 1 {
@@ -31,12 +31,12 @@ func lineCounter(file *os.File) int {
 			os.Exit(1)
 			break
 		}
-		count += 1
+		count++
 	}
 	return count
 }
 
-func print_rows(file *os.File) {
+func printRows(file *os.File) {
 	sc := bufio.NewScanner(file)
 
 	for i := 1; sc.Scan(); i++ {
@@ -52,7 +52,7 @@ func print_rows(file *os.File) {
 }
 
 func main() {
-	len, args := get_args()
+	len, args := getArgs()
 	for i, path := range args {
 		file, err := os.Open(path)
 		if err != nil {
@@ -81,7 +81,7 @@ func main() {
 				fmt.Printf("%s has %d lines\n", path, rows)
 			}
 		} else {
-			print_rows(file)
+			printRows(file)
 		}
 	}
 }
